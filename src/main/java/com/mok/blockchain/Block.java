@@ -1,14 +1,19 @@
 package com.mok.blockchain;
 
+import com.mok.blockchain.utils.SHA256;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Block {
+public class Block<T extends Tx> {
     private String hash;
     private String previousHash;
     private String data;
+    private List<T> transactions = new ArrayList<T>();
     private long timeStamp;
     private int nonce;
 
@@ -31,19 +36,7 @@ public class Block {
 
     public String calculateBlockHash() {
         String dataToHash = previousHash + Long.toString(timeStamp) + Integer.toString(nonce) + data;
-        MessageDigest digest = null;
-        byte[] bytes = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-            bytes = digest.digest(dataToHash.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException ex) {
-//            logger.log(Level.SEVERE, ex.getMessage());
-        }
-        StringBuffer buffer = new StringBuffer();
-        for (byte b : bytes) {
-            buffer.append(String.format("%02x", b));
-        }
-        return buffer.toString();
+        return SHA256.generateHash(dataToHash);
     }
 
     public String getHash() {
@@ -84,5 +77,13 @@ public class Block {
 
     public void setNonce(int nonce) {
         this.nonce = nonce;
+    }
+
+    public List<T> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<T> transactions) {
+        this.transactions = transactions;
     }
 }
